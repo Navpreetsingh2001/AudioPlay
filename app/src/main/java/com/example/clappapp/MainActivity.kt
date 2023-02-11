@@ -13,10 +13,13 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding :ActivityMainBinding
 
-    private  var mediaPlayer :MediaPlayer? =null
-    private lateinit var seekBar:SeekBar
+    private var mediaPlayer: MediaPlayer? =null
+    private lateinit var seekBar: SeekBar
     private lateinit var runnable: Runnable
     private lateinit var handler: Handler
+
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,41 +27,36 @@ class MainActivity : AppCompatActivity() {
         binding= ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
-
-        seekBar=binding.sbClapping
+        seekBar =binding.sbClapping
         handler = Handler(Looper.getMainLooper())
 
-        binding.fabPlay.setOnClickListener {
-            if (mediaPlayer == null){
-                mediaPlayer =MediaPlayer.create(this,R.raw.clapps)
-                initializeSeekbar()
 
+
+        binding.fabPlay.setOnClickListener {
+            if (mediaPlayer==null) {
+                mediaPlayer =MediaPlayer.create(this,R.raw.clapps)
+                seekbarInit()
             }
             mediaPlayer?.start()
         }
-
-        binding.fabPause.setOnClickListener {
+        binding.fabPause.setOnClickListener{
             mediaPlayer?.pause()
-
         }
-        binding.fabStop.setOnClickListener {
+        binding.fabStop.setOnClickListener{
             mediaPlayer?.stop()
             mediaPlayer?.reset()
             mediaPlayer?.release()
             mediaPlayer=null
-           handler.removeCallbacks(runnable)
-          seekBar.progress=0
+            handler.removeCallbacks(runnable)
+            seekBar.progress=0
+
+
         }
-
     }
-
-    private fun initializeSeekbar(){
-        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener
-        {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                //connecting mediaplayer with seekbar
-                if (fromUser)mediaPlayer?.seekTo(progress)
+    private fun seekbarInit(){
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, Tf: Boolean) {
+                if (Tf) mediaPlayer?.seekTo(progress)
             }
 
             override fun onStartTrackingTouch(p0: SeekBar?) {
@@ -70,11 +68,53 @@ class MainActivity : AppCompatActivity() {
             }
 
         })
-        seekBar.max =mediaPlayer!!.duration
+
+
+
+
+        seekBar.max = mediaPlayer!!.duration
         runnable = Runnable {
+            val tvPlayed =binding.tvPlayed
+            val tvdue =binding.tvDelayed
+
             seekBar.progress =mediaPlayer!!.currentPosition
+            val playedTime =mediaPlayer!!.currentPosition/1000
+            tvPlayed.text ="$playedTime sec"
+            val duration =mediaPlayer!!.duration/1000
+            val dueTime =duration- playedTime
+            tvdue.text ="$dueTime"
             handler.postDelayed(runnable,1000)
+
         }
         handler.postDelayed(runnable,1000)
     }
+
+
+
+
+
+//    private fun initializeSeekbar(){
+//        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener
+//        {
+//            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+//                //connecting mediaplayer with seekbar
+//                if (fromUser)mediaPlayer?.seekTo(progress)
+//            }
+//
+//            override fun onStartTrackingTouch(p0: SeekBar?) {
+//
+//            }
+//
+//            override fun onStopTrackingTouch(p0: SeekBar?) {
+//
+//            }
+//
+//        })
+//        seekBar.max =mediaPlayer!!.duration
+//        runnable = Runnable {
+//            seekBar.progress =mediaPlayer!!.currentPosition
+//            handler.postDelayed(runnable,1000)
+//        }
+//        handler.postDelayed(runnable,1000)
+//    }
 }
